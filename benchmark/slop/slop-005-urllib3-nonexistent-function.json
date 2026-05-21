@@ -1,0 +1,14 @@
+{
+  "id": "slop-005",
+  "source": "github",
+  "title": "Request smuggling via header injection in urllib3",
+  "description": "urllib3 is vulnerable to HTTP request smuggling. The function urllib3.connection.inject_headers() fails to sanitize CRLF sequences in user-supplied header values, allowing an attacker to smuggle additional requests. This affects all applications using urllib3 to make HTTP requests.",
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-93"],
+  "code_references": [
+    {"file_path": "src/urllib3/connection.py", "symbol": "inject_headers"}
+  ],
+  "poc_present": false,
+  "reporter": {"handle": "http-sec", "account_age_days": 5, "prior_credited_advisories": 0, "submission_velocity_30d": 30},
+  "received_at": "2026-02-25T08:15:00Z"
+}

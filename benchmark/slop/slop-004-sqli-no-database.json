@@ -1,0 +1,15 @@
+{
+  "id": "slop-004",
+  "source": "github",
+  "title": "SQL injection in user input handling",
+  "description": "There is a SQL injection vulnerability in the way the library handles user-supplied input. An attacker can inject malicious SQL through the parse() function, allowing them to read or modify arbitrary database records, bypass authentication, and exfiltrate sensitive data. The input is concatenated directly into a SQL query without sanitization.",
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-89"],
+  "code_references": [
+    {"file_path": "src/parser.py", "symbol": "parse"}
+  ],
+  "poc_present": true,
+  "poc_text": "parse(\"1' OR '1'='1\")",
+  "reporter": {"handle": "sqlmaster", "account_age_days": 60, "prior_credited_advisories": 0, "submission_velocity_30d": 15},
+  "received_at": "2026-02-20T11:00:00Z"
+}

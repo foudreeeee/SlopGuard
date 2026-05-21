@@ -1,0 +1,16 @@
+{
+  "id": "slop-001",
+  "source": "email",
+  "title": "Critical heap buffer overflow in cURL SASL authentication",
+  "description": "I have discovered a critical security vulnerability in cURL. There is a heap buffer overflow in the SASL authentication handler. When a malicious server sends a crafted SASL challenge, the function curl_sasl_decode_challenge() in lib/curl_sasl_handler.c does not validate the length of the incoming buffer before copying it, leading to a heap-based buffer overflow that can be leveraged for remote code execution. This affects all versions of cURL and should be patched immediately. The root cause is an unsafe memcpy without bounds checking.",
+  "claimed_affected_versions": ["all versions"],
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-122"],
+  "code_references": [
+    {"file_path": "lib/curl_sasl_handler.c", "line_number": 471, "symbol": "curl_sasl_decode_challenge"}
+  ],
+  "poc_present": true,
+  "poc_text": "Send a SASL challenge larger than 256 bytes via a malicious IMAP/SMTP server to trigger the overflow.",
+  "reporter": {"handle": "anon-researcher-7f3a", "account_age_days": 3, "prior_credited_advisories": 0, "submission_velocity_30d": 22},
+  "received_at": "2026-02-14T09:23:00Z"
+}

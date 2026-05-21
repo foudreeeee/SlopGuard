@@ -1,0 +1,12 @@
+{
+  "id": "slop-007",
+  "source": "github",
+  "title": "Critical RCE via verbose error messages",
+  "description": "The application returns verbose error messages that include stack traces. This is a critical remote code execution vulnerability because attackers can use the information to execute arbitrary code on the server. The stack trace reveals internal file paths. CVSS 9.8 critical.",
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-209"],
+  "code_references": [],
+  "poc_present": false,
+  "reporter": {"handle": "infoleak-hunter", "account_age_days": 20, "prior_credited_advisories": 0, "submission_velocity_30d": 12},
+  "received_at": "2026-02-28T17:00:00Z"
+}

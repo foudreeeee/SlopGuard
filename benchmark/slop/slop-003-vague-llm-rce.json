@@ -1,0 +1,11 @@
+{
+  "id": "slop-003",
+  "source": "email",
+  "title": "Security vulnerability in your software",
+  "description": "Hello, I am a security researcher and I found a serious security vulnerability in your application. The vulnerability could allow an attacker to compromise the system and gain unauthorized access. It is related to improper input validation and could lead to remote code execution, data leakage, and denial of service. This is a high severity issue. Please let me know if you have a bug bounty program so I can share the details. I look forward to my reward.",
+  "claimed_severity": "high",
+  "code_references": [],
+  "poc_present": false,
+  "reporter": {"handle": "anon-9c1", "account_age_days": 1, "prior_credited_advisories": 0, "submission_velocity_30d": 8},
+  "received_at": "2026-03-02T22:41:00Z"
+}

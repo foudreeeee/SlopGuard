@@ -1,0 +1,11 @@
+{
+  "id": "slop-008",
+  "source": "github",
+  "title": "[SECURITY] Vulnerability found in your repository",
+  "description": "Dear maintainer, during an automated security scan I identified a potential security vulnerability in your repository. The issue relates to the use of an outdated dependency that may contain known vulnerabilities. Please review and update your dependencies. This report was generated as part of a large-scale security assessment of open source projects.",
+  "claimed_severity": "medium",
+  "code_references": [],
+  "poc_present": false,
+  "reporter": {"handle": "mass-scan-bot", "account_age_days": 2, "prior_credited_advisories": 0, "submission_velocity_30d": 147},
+  "received_at": "2026-03-15T06:00:00Z"
+}

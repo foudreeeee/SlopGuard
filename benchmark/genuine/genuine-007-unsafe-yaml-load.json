@@ -1,0 +1,16 @@
+{
+  "id": "genuine-007",
+  "source": "github",
+  "title": "Arbitrary code execution via yaml.load on user-supplied config",
+  "description": "config/loader.py parses user-uploaded configuration files with yaml.load(data) using the default Loader rather than safe_load. A crafted document using Python object tags (for example !!python/object/apply:os.system) executes arbitrary commands during deserialization. load_config() should call yaml.safe_load. The path is reachable from the /import endpoint, which accepts an uploaded .yml file.",
+  "claimed_affected_versions": [">= 0.9.0", "< 1.2.3"],
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-502"],
+  "code_references": [
+    {"file_path": "config/loader.py", "line_number": 17, "symbol": "load_config"}
+  ],
+  "poc_present": true,
+  "poc_text": "Upload a config containing: !!python/object/apply:os.system ['id']",
+  "reporter": {"handle": "deser-audit", "account_age_days": 1300, "prior_credited_advisories": 7, "submission_velocity_30d": 2},
+  "received_at": "2026-02-06T19:15:00Z"
+}

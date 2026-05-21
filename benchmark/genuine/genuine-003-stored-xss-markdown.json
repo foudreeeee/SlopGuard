@@ -1,0 +1,16 @@
+{
+  "id": "genuine-003",
+  "source": "gitlab",
+  "title": "Stored XSS in comment rendering via unescaped markdown image title",
+  "description": "Comments are rendered by render/markdown.py. The image syntax with a title attribute passes the title through to the output <img> tag without HTML-escaping, so a title containing a closing quote and a script tag is injected as raw HTML and runs in the context of other users viewing the comment. render_image() builds the tag with an f-string and never escapes the title.",
+  "claimed_affected_versions": [">= 3.0.0"],
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-79"],
+  "code_references": [
+    {"file_path": "render/markdown.py", "line_number": 211, "symbol": "render_image"}
+  ],
+  "poc_present": true,
+  "poc_text": "Post a comment with an image whose title attribute is: \"><script>alert(document.cookie)</script>",
+  "reporter": {"handle": "xss-reporter", "account_age_days": 600, "prior_credited_advisories": 2, "submission_velocity_30d": 1},
+  "received_at": "2026-02-09T09:50:00Z"
+}

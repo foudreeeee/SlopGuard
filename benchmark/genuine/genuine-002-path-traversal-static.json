@@ -1,0 +1,16 @@
+{
+  "id": "genuine-002",
+  "source": "github",
+  "title": "Path traversal in static file handler allows reading arbitrary files",
+  "description": "The static file handler in handlers/files.py joins the user-supplied path to the document root without normalizing or rejecting '..' segments. A request for /static/..%2f..%2f..%2fetc%2fpasswd resolves outside the document root and returns the file contents. serve_static() passes the decoded path to os.path.join and then open() with no containment check.",
+  "claimed_affected_versions": ["<= 1.4.2"],
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-22"],
+  "code_references": [
+    {"file_path": "handlers/files.py", "line_number": 53, "symbol": "serve_static"}
+  ],
+  "poc_present": true,
+  "poc_text": "curl 'http://target/static/..%2f..%2f..%2fetc%2fpasswd'",
+  "reporter": {"handle": "appsec-jane", "account_age_days": 900, "prior_credited_advisories": 3, "submission_velocity_30d": 1},
+  "received_at": "2026-02-03T14:20:00Z"
+}

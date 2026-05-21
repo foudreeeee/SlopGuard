@@ -1,0 +1,16 @@
+{
+  "id": "genuine-001",
+  "source": "github",
+  "title": "ReDoS in email validation regex",
+  "description": "The email validation regular expression in validators.py is vulnerable to catastrophic backtracking (ReDoS). The pattern ^([a-zA-Z0-9]+)+@ contains nested quantifiers. An input of 30+ 'a' characters followed by a non-matching character causes exponential backtracking. On the current main branch I measured roughly 8 seconds of CPU for a 30-character input, scaling exponentially with length. A request carrying such an email field can stall a worker.",
+  "claimed_affected_versions": [">= 2.3.0", "< 2.6.1"],
+  "claimed_severity": "medium",
+  "claimed_cwe": ["CWE-1333"],
+  "code_references": [
+    {"file_path": "src/myproj/validators.py", "line_number": 88, "symbol": "validate_email"}
+  ],
+  "poc_present": true,
+  "poc_text": "from myproj.validators import validate_email; validate_email('a'*40 + '!')  # hangs",
+  "reporter": {"handle": "regex-auditor", "account_age_days": 1400, "prior_credited_advisories": 6, "submission_velocity_30d": 2},
+  "received_at": "2026-01-18T10:05:00Z"
+}

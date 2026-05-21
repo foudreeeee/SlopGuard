@@ -1,0 +1,16 @@
+{
+  "id": "genuine-004",
+  "source": "github",
+  "title": "Authorization check uses substring membership, allowing privilege confusion",
+  "description": "In core/access.py, check_permission() compares the user's role to the required role with `if required in role` where required is a string. Any role whose name contains the required string passes the check, so a user with role 'xadmin' is granted access to an endpoint guarded by required='admin'. The comparison should be exact, or a set membership against an explicit role list.",
+  "claimed_affected_versions": [">= 2.0.0", "< 2.5.4"],
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-285"],
+  "code_references": [
+    {"file_path": "core/access.py", "line_number": 132, "symbol": "check_permission"}
+  ],
+  "poc_present": true,
+  "poc_text": "Assign a user the role 'xadmin' and call an endpoint guarded by required='admin'; the substring check passes.",
+  "reporter": {"handle": "authz-research", "account_age_days": 1100, "prior_credited_advisories": 4, "submission_velocity_30d": 1},
+  "received_at": "2026-01-25T16:40:00Z"
+}

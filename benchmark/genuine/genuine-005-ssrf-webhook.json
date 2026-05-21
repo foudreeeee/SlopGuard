@@ -1,0 +1,16 @@
+{
+  "id": "genuine-005",
+  "source": "github",
+  "title": "SSRF in webhook URL fetcher: no host allowlist, follows redirects to internal IPs",
+  "description": "The webhook delivery code in webhooks/client.py fetches a user-configured URL with requests.get(url, allow_redirects=True) and no validation of the destination host. An attacker can point a webhook at http://169.254.169.254/ or an internal service, and because redirects are followed, even an allowlisted host can 302 to an internal address. send_webhook() should validate the resolved IP and re-validate after each redirect.",
+  "claimed_affected_versions": ["<= 4.1.0"],
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-918"],
+  "code_references": [
+    {"file_path": "webhooks/client.py", "line_number": 47, "symbol": "send_webhook"}
+  ],
+  "poc_present": true,
+  "poc_text": "Set a webhook target of http://169.254.169.254/latest/meta-data/ and observe the response body delivered back to the configured sink.",
+  "reporter": {"handle": "ssrf-hunter", "account_age_days": 750, "prior_credited_advisories": 5, "submission_velocity_30d": 3},
+  "received_at": "2026-02-12T12:00:00Z"
+}

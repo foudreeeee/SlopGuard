@@ -1,0 +1,16 @@
+{
+  "id": "genuine-006",
+  "source": "email",
+  "title": "Non-constant-time comparison of API tokens enables timing attack",
+  "description": "auth/tokens.py compares the presented API token to the stored value with a plain '==' in verify_token(). Python string '==' short-circuits on the first differing byte, so response time leaks a prefix oracle and an attacker can recover the token byte by byte over many requests. Use hmac.compare_digest instead. I measured a small but consistent timing difference per matching prefix byte in a local benchmark.",
+  "claimed_affected_versions": [">= 1.0.0"],
+  "claimed_severity": "medium",
+  "claimed_cwe": ["CWE-208"],
+  "code_references": [
+    {"file_path": "auth/tokens.py", "line_number": 29, "symbol": "verify_token"}
+  ],
+  "poc_present": true,
+  "poc_text": "Benchmark verify_token() latency across candidate tokens sharing increasing prefixes; matching prefixes are measurably slower.",
+  "reporter": {"handle": "crypto-tim", "account_age_days": 2000, "prior_credited_advisories": 9, "submission_velocity_30d": 1},
+  "received_at": "2026-01-11T08:30:00Z"
+}

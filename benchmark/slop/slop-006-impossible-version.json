@@ -1,0 +1,15 @@
+{
+  "id": "slop-006",
+  "source": "email",
+  "title": "Authentication bypass in v0.1.0",
+  "description": "I found an authentication bypass in the OAuth2 token validation logic that was introduced in version 0.1.0. The system fails to verify the token signature, allowing forged tokens to be accepted. This affects the validate_oauth_token function in the auth module.",
+  "claimed_affected_versions": ["0.1.0"],
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-287"],
+  "code_references": [
+    {"file_path": "src/auth/oauth.py", "symbol": "validate_oauth_token"}
+  ],
+  "poc_present": false,
+  "reporter": {"handle": "anon-aa12", "account_age_days": 7, "prior_credited_advisories": 0, "submission_velocity_30d": 19},
+  "received_at": "2026-03-10T13:30:00Z"
+}
