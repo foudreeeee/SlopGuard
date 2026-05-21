@@ -7,6 +7,6 @@ See docs/architecture.md for the design.
 
 __version__ = "0.1.0-dev"
 
-from slopguard.schema import Report, CodeReference, ReporterInfo
+from slopguard.schema import CodeReference, Report, ReporterInfo
 
 __all__ = ["Report", "CodeReference", "ReporterInfo"]

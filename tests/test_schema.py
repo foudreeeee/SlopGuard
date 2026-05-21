@@ -1,6 +1,6 @@
 """Tests for the internal schema. Verifies that the data model is well-formed."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -22,7 +22,7 @@ def test_minimal_report_validates():
         source="cli",
         title="Buffer overflow in parser",
         description="A buffer overflow occurs when the input exceeds 512 bytes.",
-        received_at=datetime.now(timezone.utc),
+        received_at=datetime.now(UTC),
     )
     assert report.id == "test-001"
     assert report.code_references == []
@@ -43,7 +43,7 @@ def test_report_with_code_reference():
                 symbol="parse_json",
             )
         ],
-        received_at=datetime.now(timezone.utc),
+        received_at=datetime.now(UTC),
     )
     assert len(report.code_references) == 1
     assert report.code_references[0].file_path == "src/parser.c"
@@ -63,7 +63,7 @@ def test_confidence_score_bounded():
             confidence_score=150,
             suggested_action="fast_track",
             static_checks=[],
-            processed_at=datetime.now(timezone.utc),
+            processed_at=datetime.now(UTC),
         )
 
 
