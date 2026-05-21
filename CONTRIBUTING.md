@@ -1,32 +1,22 @@
-# Contributing to SlopGuard
+# Contributing
 
-The project is in early development. Once the first prototype is published (estimated June 2026), code contributions will be welcomed under the usual GitHub fork-and-pull-request flow.
+The project is in design phase. Code contributions will be opened up once there's a real prototype to contribute to (mid-2026 target).
 
-For now, the most useful contributions are:
+What's actually useful right now:
 
-## Feedback from maintainers
+**If you maintain an OSS project getting hit by slop**, open an issue. Tell me:
+- How much slop per week/month?
+- What patterns? (specific tooling? specific styles?)
+- What would a triage tool need to do to actually help you?
+- What would make it actively harmful?
 
-If you maintain an open-source project and have been receiving AI-generated vulnerability reports, please [open an issue](../../issues/new) describing your experience:
+Anonymous is fine.
 
-- How many slop reports per week or month do you receive?
-- What are the most common slop patterns you see?
-- What would make a triage tool actually useful for your workflow?
-- What would make a triage tool actively harmful?
+**If you can share an example slop report** (PII redacted), attach it. These build the benchmark dataset that calibrates the static and LLM layers. By default samples go into the public CC-BY dataset; say so if you want yours kept private.
 
-Anonymous reports are fine.
+**Code (later):**
+- `ruff` and `pytest` clean before pushing.
+- Architectural changes get an issue first.
+- The project's anti-slop logic applies to its own PRs. If you used AI assistance, you're still responsible for what you submit.
 
-## Sample slop reports
-
-If you can share an example of a slop report you have received, with personal information of the reporter redacted, please attach it to an issue. These reports are extraordinarily valuable for building the benchmark dataset that will calibrate SlopGuard's static and LLM layers.
-
-By default, contributed samples will be incorporated into the public benchmark dataset under CC-BY-4.0. If you prefer your sample to remain private, please say so in the issue and we will use it for development only.
-
-## Code contributions (when the project opens to them)
-
-- Run `ruff` and `pytest` before pushing.
-- Keep PRs focused. Architectural changes get their own issue first.
-- The project's anti-slop methodology applies recursively: AI-assisted contributions are welcome but the human contributor is responsible for the quality of the submission.
-
-## Code of conduct
-
-Standard contributor expectations apply: be respectful, assume good faith, and remember that the people most affected by AI slop are already exhausted. Adding to that exhaustion through unkind communication defeats the project's purpose.
+Be decent to each other. The people most affected by slop are already worn out, no need to add to it.

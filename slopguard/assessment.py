@@ -1,20 +1,12 @@
-"""
-LLM-assisted claim assessment layer.
+"""LLM claim assessment layer.
 
-Only reports passing the static verification layer reach this stage.
-The LLM is used as a grounded reasoner over evidence the static layer
-has already extracted, not as an autonomous oracle.
+Runs after static checks pass. The LLM gets the report + the actual code
+the static layer pulled out. It's not allowed to reference anything outside
+that context — if it does, we override the verdict to UNDETERMINED.
 
-Design goals:
-- Hallucination resistance via grounding. The model is forbidden from
-  referencing files or symbols not in the provided context.
-- Prompt-injection resistance. Report text is treated as untrusted
-  input throughout. Outputs are typed and validated.
-- Cost ceiling. Target under $0.05 per assessment, including retries.
+Methodologically borrowed from HalluJudge (Tantithamthavorn et al., 2026).
 
-Methodological foundation: HalluJudge (Tantithamthavorn et al., 2026).
-
-Implementation status: design phase.
+Status: skeleton.
 """
 
 from __future__ import annotations
@@ -31,39 +23,27 @@ def assess_claim(
     static_checks: list[VerificationCheck],
     repo_path: str,
 ) -> LLMAssessment:
-    """Run the grounded claim assessment for a report.
+    """Grounded claim assessment. PLAUSIBLE / IMPLAUSIBLE / UNDETERMINED.
 
-    Args:
-        report: The normalized report.
-        static_checks: Results from the static verification layer. Used to
-            decide which code excerpts to extract for the LLM context.
-        repo_path: Local filesystem path to the repository.
-
-    Returns:
-        A typed LLMAssessment. Outputs not matching the Pydantic schema
-        are treated as soft-rejection signals and produce an
-        UNDETERMINED verdict.
+    Outputs failing schema validation → soft-reject (treated as UNDETERMINED).
     """
-    raise NotImplementedError("Phase 2 implementation.")
+    raise NotImplementedError("Phase 2.")
 
 
 def _build_grounded_context(
     report: Report, static_checks: list[VerificationCheck], repo_path: str
 ) -> dict:
-    """Extract the exact code excerpts and metadata to feed into the LLM.
+    """Pull the exact code excerpts and metadata the LLM is allowed to see.
 
-    The LLM only sees this context. Any file or symbol not present here
-    is considered hallucinated if the model cites it.
+    Anything outside this context is hallucinated if the model cites it.
     """
-    raise NotImplementedError("Phase 2 implementation.")
+    raise NotImplementedError("Phase 2.")
 
 
 def _validate_citations(
     assessment: LLMAssessment, allowed_context: dict
 ) -> LLMAssessment:
-    """Override the LLM verdict to UNDETERMINED if it cites code not in
-    the provided context.
-
-    This is the second line of defense against hallucinated assessments.
+    """Second line of defense: override to UNDETERMINED if the model
+    cites code that wasn't in the context.
     """
-    raise NotImplementedError("Phase 2 implementation.")
+    raise NotImplementedError("Phase 2.")

@@ -1,9 +1,7 @@
-"""
-Internal data schema for SlopGuard.
+"""Internal data schema.
 
-All adapters (GitHub, GitLab, email, CLI) normalize incoming reports into
-the `Report` type defined here. The verification and assessment layers
-operate exclusively on this normalized form.
+All adapters normalize incoming reports into `Report`. Verification and
+assessment layers only ever see this normalized form.
 """
 
 from __future__ import annotations
