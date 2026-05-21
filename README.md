@@ -2,7 +2,7 @@
 
 Triage layer for incoming vulnerability reports, aimed at open-source maintainers drowning in AI-generated slop.
 
-Early days. No releases yet. The schema works and the tests pass, the rest is being written.
+Early days. No releases yet. Static checks and a CLI work now, the LLM layer is next.
 
 ## Why
 
@@ -58,14 +58,19 @@ GitHub App, GitLab webhook, Maildir watcher, or stdin CLI. Same internal schema 
 
 - [x] Schema (Pydantic, tested)
 - [x] Architecture doc
-- [x] Code reference grounding (git-based, 60 tests passing)
+- [x] Code reference grounding (git-based)
 - [x] GHSA / NVD dedup
 - [ ] CWE plausibility
+- [ ] Reporter signal
+- [x] Confidence scoring + suggested action
+- [x] CLI (triage from stdin or file, JSON or text)
 - [ ] LLM layer with grounded prompts
 - [ ] Prompt injection hardening
 - [ ] GitHub App
 - [ ] GitLab / email adapters
 - [x] Benchmark dataset
+
+88 tests passing, CI green on 3.11 and 3.12.
 
 Target: prototype usable by mid-2026.
 
