@@ -58,14 +58,14 @@ GitHub App, GitLab webhook, Maildir watcher, or stdin CLI. Same internal schema 
 
 - [x] Schema (Pydantic, tested)
 - [x] Architecture doc
-- [x] Code reference grounding (git-based, 10 tests passing)
-- [ ] GHSA / NVD dedup
+- [x] Code reference grounding (git-based, 60 tests passing)
+- [x] GHSA / NVD dedup
 - [ ] CWE plausibility
 - [ ] LLM layer with grounded prompts
 - [ ] Prompt injection hardening
 - [ ] GitHub App
 - [ ] GitLab / email adapters
-- [ ] Benchmark dataset
+- [x] Benchmark dataset
 
 Target: prototype usable by mid-2026.
 
