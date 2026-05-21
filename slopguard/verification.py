@@ -3,8 +3,8 @@
 Cheap, deterministic checks. Runs before any LLM call.
 Conservative by default — burying a real report is worse than letting slop through.
 
-`_check_code_references` and `_check_advisory_dedup` are implemented and tested.
-CWE plausibility and reporter signal are still TODOs (Phase 1 continues).
+All four static checks are implemented and tested: code reference grounding,
+advisory dedup, CWE plausibility, and reporter signal.
 """
 
 from __future__ import annotations
@@ -14,6 +14,7 @@ import re
 import subprocess
 from collections import Counter
 from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
 
 from slopguard.advisories import Advisory, load_advisories
@@ -41,7 +42,8 @@ def verify_report(
     if advisories is None:
         advisories = load_advisories()
     checks.extend(_check_advisory_dedup(report, advisories))
-    # TODO Phase 1: CWE plausibility, reporter signal
+    checks.extend(_check_cwe_plausibility(report, repo_path))
+    checks.extend(_check_reporter_signal(report))
     return checks
 
 
@@ -363,19 +365,251 @@ class _TfidfIndex:
         return sims
 
 
+# CWE plausibility is a conservative heuristic. It flags a claim implausible
+# only when the project shows no sign of the surface that CWE needs (a SQL
+# injection claim against a project with no database code, say). When unsure it
+# stays quiet: burying a real report is worse than letting one through. It
+# downgrades a claim, it never rejects it.
+MIN_SCAN_FOR_IMPLAUSIBLE = 3
+
+_SOURCE_EXTENSIONS = {
+    ".py", ".js", ".ts", ".jsx", ".tsx", ".go", ".rs", ".java", ".rb", ".php",
+    ".c", ".cc", ".cpp", ".h", ".hpp", ".cs", ".scala", ".kt", ".ex", ".exs",
+    ".pl", ".swift",
+}
+_MANIFEST_FILES = {
+    "requirements.txt", "pyproject.toml", "setup.py", "setup.cfg", "Pipfile",
+    "package.json", "go.mod", "Cargo.toml", "Gemfile", "pom.xml",
+    "build.gradle", "composer.json",
+}
+# Deliberately broad: over-detecting a capability only makes us MORE likely to
+# call a CWE plausible, which is the safe direction. Markers are matched
+# lowercased against source + manifest text.
+_CAPABILITY_MARKERS = {
+    "database": [
+        "sqlite3", "psycopg", "pymysql", "mysqlclient", "sqlalchemy",
+        "django.db", "mongo", "sequelize", "gorm", "diesel", "activerecord",
+        "jdbc", "cursor.execute", "select ", "insert into",
+    ],
+    "web_output": [
+        "flask", "django", "fastapi", "starlette", "express", "koa", "sinatra",
+        "rails", "render_template", "jinja", "text/html", "res.send", "<html",
+    ],
+    "deserialization": [
+        "pickle", "yaml.load", "marshal.load", "objectinputstream",
+        "readobject", "unserialize(", "jackson", "fasterxml",
+    ],
+    "command_exec": [
+        "subprocess", "os.system", "os.popen", "exec(", "eval(",
+        "child_process", "runtime.exec", "shell=true", "popen(",
+    ],
+    "xml": [
+        "lxml", "xml.etree", "elementtree", "xml.dom", "expat",
+        "documentbuilder", "saxparser", "xmlreader", "<!doctype",
+    ],
+    "http_client": [
+        "requests.", "urllib.request", "httpx", "http.client", "aiohttp",
+        "axios", "fetch(", "net/http", "reqwest", "urlopen",
+    ],
+    "regex": ["import re", "re.compile", "regexp", "pattern.compile", "regex::"],
+}
+_CWE_CAPABILITY = {
+    "CWE-89": "database",
+    "CWE-564": "database",
+    "CWE-79": "web_output",
+    "CWE-80": "web_output",
+    "CWE-502": "deserialization",
+    "CWE-78": "command_exec",
+    "CWE-77": "command_exec",
+    "CWE-94": "command_exec",
+    "CWE-611": "xml",
+    "CWE-776": "xml",
+    "CWE-918": "http_client",
+    "CWE-1333": "regex",
+}
+
+
+@dataclass(frozen=True)
+class _Profile:
+    capabilities: frozenset[str]
+    scanned_files: int
+
+
 def _check_cwe_plausibility(
     report: Report, repo_path: str
 ) -> list[VerificationCheck]:
-    """Could the claimed CWE actually happen here? (SQLi on a no-DB project = no.)
+    """Could the claimed CWE happen here, given the project's surface?
 
-    TODO Phase 1: project profile derivation.
+    Flags `cwe_implausible` only when a modeled CWE needs a surface the project
+    shows no sign of. Otherwise PASS (surface present) or INDETERMINATE (no
+    claim, an unmodeled CWE, or too little scanned). Downgrades, never rejects.
     """
-    raise NotImplementedError("Phase 1.")
+    if not report.claimed_cwe:
+        return []
+    profile = _derive_project_profile(repo_path)
+    if profile is None:
+        return [
+            VerificationCheck(
+                name="cwe_plausibility",
+                outcome=CheckOutcome.INDETERMINATE,
+                detail="Could not profile the project (not a git repo or unreadable).",
+            )
+        ]
+    modeled = [
+        (cwe.upper(), _CWE_CAPABILITY[cwe.upper()])
+        for cwe in report.claimed_cwe
+        if cwe.upper() in _CWE_CAPABILITY
+    ]
+    if not modeled:
+        return [
+            VerificationCheck(
+                name="cwe_plausibility",
+                outcome=CheckOutcome.INDETERMINATE,
+                detail=(
+                    f"Claimed CWE(s) {report.claimed_cwe} are not modeled by the "
+                    f"plausibility check."
+                ),
+            )
+        ]
+    missing = [
+        (cwe, cap) for cwe, cap in modeled if cap not in profile.capabilities
+    ]
+    if missing:
+        if profile.scanned_files < MIN_SCAN_FOR_IMPLAUSIBLE:
+            return [
+                VerificationCheck(
+                    name="cwe_plausibility",
+                    outcome=CheckOutcome.INDETERMINATE,
+                    detail=(
+                        f"Only {profile.scanned_files} source files scanned, too "
+                        f"few to judge whether the surface is really absent."
+                    ),
+                )
+            ]
+        detail = "; ".join(
+            f"{cwe} needs a {cap} surface, none detected" for cwe, cap in missing
+        )
+        return [
+            VerificationCheck(
+                name="cwe_implausible",
+                outcome=CheckOutcome.FAIL,
+                detail=(
+                    f"Claimed class looks implausible here: {detail}. "
+                    f"Downgraded, not rejected."
+                ),
+            )
+        ]
+    present = ", ".join(f"{cwe} ({cap})" for cwe, cap in modeled)
+    return [
+        VerificationCheck(
+            name="cwe_plausible",
+            outcome=CheckOutcome.PASS,
+            detail=f"Project has the surface the claimed CWE needs: {present}.",
+        )
+    ]
+
+
+def _derive_project_profile(repo_path: str) -> _Profile | None:
+    """Scan the repo's tracked source + manifests for capability markers.
+
+    Reads the working tree (not a specific commit) and is bounded: it skips
+    large files and stops after a file/byte budget, so it stays cheap on big
+    repos. Returns None when the path isn't a readable git repo.
+    """
+    repo = Path(repo_path)
+    if not (repo / ".git").is_dir():
+        return None
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo), "ls-files"],
+            check=True,
+            capture_output=True,
+            timeout=10,
+        )
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+
+    capabilities: set[str] = set()
+    scanned = 0
+    budget = 8_000_000
+    for rel in result.stdout.decode("utf-8", errors="replace").splitlines():
+        rel_path = Path(rel)
+        if (
+            rel_path.suffix not in _SOURCE_EXTENSIONS
+            and rel_path.name not in _MANIFEST_FILES
+        ):
+            continue
+        path = repo / rel
+        try:
+            if path.stat().st_size > 512_000:
+                continue
+            text = path.read_text(encoding="utf-8", errors="replace").lower()
+        except OSError:
+            continue
+        scanned += 1
+        budget -= len(text)
+        for capability, markers in _CAPABILITY_MARKERS.items():
+            if capability not in capabilities and any(m in text for m in markers):
+                capabilities.add(capability)
+        if scanned >= 1500 or budget <= 0:
+            break
+    return _Profile(capabilities=frozenset(capabilities), scanned_files=scanned)
+
+
+# Reporter signal is soft and never decisive (the decision layer weights it
+# low). Only a very high cross-project submission rate counts against a report;
+# a new account is routed to normal review, not penalized.
+REPORTER_VELOCITY_SUSPICIOUS = 50  # reports per 30 days, across all projects
 
 
 def _check_reporter_signal(report: Report) -> list[VerificationCheck]:
-    """Soft signals only. Account age, prior credits, velocity.
+    """Soft reputation signal. Never decisive (see decision.py weights).
 
-    TODO Phase 1.
+    High 30-day submission velocity is a slight negative (spray pattern); a
+    track record of prior credited advisories is a positive; a new or unknown
+    reporter is neutral, not penalized.
     """
-    raise NotImplementedError("Phase 1.")
+    info = report.reporter
+    has_data = (
+        info.handle is not None
+        or info.account_age_days is not None
+        or info.prior_credited_advisories > 0
+        or info.submission_velocity_30d > 0
+    )
+    if not has_data:
+        return [
+            VerificationCheck(
+                name="reporter_signal",
+                outcome=CheckOutcome.INDETERMINATE,
+                detail="No reporter metadata available.",
+            )
+        ]
+    if info.submission_velocity_30d >= REPORTER_VELOCITY_SUSPICIOUS:
+        return [
+            VerificationCheck(
+                name="reporter_signal",
+                outcome=CheckOutcome.FAIL,
+                detail=(
+                    f"{info.submission_velocity_30d} reports filed in the last 30 "
+                    f"days across projects — high-volume pattern. Soft signal only."
+                ),
+            )
+        ]
+    if info.prior_credited_advisories >= 1:
+        return [
+            VerificationCheck(
+                name="reporter_signal",
+                outcome=CheckOutcome.PASS,
+                detail=(
+                    f"{info.prior_credited_advisories} prior credited "
+                    f"advisories — established track record."
+                ),
+            )
+        ]
+    return [
+        VerificationCheck(
+            name="reporter_signal",
+            outcome=CheckOutcome.INDETERMINATE,
+            detail="New or unknown reporter, no track record. Not penalized.",
+        )
+    ]

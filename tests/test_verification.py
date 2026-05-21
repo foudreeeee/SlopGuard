@@ -14,12 +14,14 @@ from pathlib import Path
 import pytest
 
 from slopguard.advisories import Advisory
-from slopguard.schema import CheckOutcome, CodeReference, Report
+from slopguard.schema import CheckOutcome, CodeReference, Report, ReporterInfo
 from slopguard.verification import (
     _advisory_ids,
     _char_ngrams,
     _check_advisory_dedup,
     _check_code_references,
+    _check_cwe_plausibility,
+    _check_reporter_signal,
     _code_terms,
     _dice,
     _TfidfIndex,
@@ -344,3 +346,139 @@ def test_tfidf_identical_text_is_most_similar():
 def test_tfidf_unrelated_text_scores_zero():
     index = _TfidfIndex(["buffer overflow in parser"])
     assert index.similarities("completely different unrelated wording")[0] == 0.0
+
+
+# --- CWE plausibility ------------------------------------------------------
+
+
+def _init_repo(path: Path) -> None:
+    subprocess.run(["git", "init", "-q", str(path)], check=True)
+    subprocess.run(
+        ["git", "-C", str(path), "config", "user.email", "t@example.com"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(path), "config", "user.name", "T"], check=True
+    )
+
+
+def _commit_all(path: Path) -> None:
+    subprocess.run(["git", "-C", str(path), "add", "-A"], check=True)
+    subprocess.run(
+        ["git", "-C", str(path), "commit", "-q", "-m", "init"], check=True
+    )
+
+
+@pytest.fixture
+def bare_repo(tmp_path: Path) -> Path:
+    """A repo with several plain source files and no notable surface markers."""
+    _init_repo(tmp_path)
+    (tmp_path / "a.py").write_text("def add(x, y):\n    return x + y\n")
+    (tmp_path / "b.py").write_text("def mul(x, y):\n    return x * y\n")
+    (tmp_path / "c.py").write_text("CONST = 42\n")
+    (tmp_path / "d.py").write_text("def sub(x, y):\n    return x - y\n")
+    _commit_all(tmp_path)
+    return tmp_path
+
+
+@pytest.fixture
+def web_repo(tmp_path: Path) -> Path:
+    """A repo whose source clearly has a web-output surface."""
+    _init_repo(tmp_path)
+    (tmp_path / "app.py").write_text("from flask import Flask\napp = Flask(__name__)\n")
+    (tmp_path / "views.py").write_text(
+        "def index():\n    return render_template('i.html')\n"
+    )
+    (tmp_path / "util.py").write_text("def helper():\n    return 1\n")
+    _commit_all(tmp_path)
+    return tmp_path
+
+
+def _cwe_report(cwes: list[str] | None) -> Report:
+    return Report(
+        id="t",
+        source="cli",
+        title="t",
+        description="d",
+        claimed_cwe=cwes,
+        received_at=datetime.now(UTC),
+    )
+
+
+def test_cwe_implausible_when_surface_absent(bare_repo: Path):
+    """SQL injection claimed against a project with no database code."""
+    checks = _check_cwe_plausibility(_cwe_report(["CWE-89"]), str(bare_repo))
+    assert checks[0].outcome == CheckOutcome.FAIL
+    assert checks[0].name == "cwe_implausible"
+
+
+def test_cwe_plausible_when_surface_present(web_repo: Path):
+    checks = _check_cwe_plausibility(_cwe_report(["CWE-79"]), str(web_repo))
+    assert checks[0].outcome == CheckOutcome.PASS
+    assert checks[0].name == "cwe_plausible"
+
+
+def test_cwe_no_claim_produces_no_check(bare_repo: Path):
+    assert _check_cwe_plausibility(_cwe_report(None), str(bare_repo)) == []
+
+
+def test_cwe_unmodeled_is_indeterminate(bare_repo: Path):
+    checks = _check_cwe_plausibility(_cwe_report(["CWE-1004"]), str(bare_repo))
+    assert checks[0].outcome == CheckOutcome.INDETERMINATE
+    assert checks[0].name == "cwe_plausibility"
+
+
+def test_cwe_not_git_is_indeterminate(tmp_path: Path):
+    checks = _check_cwe_plausibility(_cwe_report(["CWE-89"]), str(tmp_path))
+    assert checks[0].outcome == CheckOutcome.INDETERMINATE
+
+
+def test_cwe_too_few_files_is_indeterminate(tmp_path: Path):
+    """One source file is too little to confidently call a surface absent."""
+    _init_repo(tmp_path)
+    (tmp_path / "only.py").write_text("def f():\n    return 1\n")
+    _commit_all(tmp_path)
+    checks = _check_cwe_plausibility(_cwe_report(["CWE-89"]), str(tmp_path))
+    assert checks[0].outcome == CheckOutcome.INDETERMINATE
+
+
+# --- reporter signal -------------------------------------------------------
+
+
+def _reporter_report(**info) -> Report:
+    return Report(
+        id="t",
+        source="cli",
+        title="t",
+        description="d",
+        reporter=ReporterInfo(**info),
+        received_at=datetime.now(UTC),
+    )
+
+
+def test_reporter_high_velocity_fails():
+    checks = _check_reporter_signal(_reporter_report(submission_velocity_30d=147))
+    assert checks[0].outcome == CheckOutcome.FAIL
+    assert checks[0].name == "reporter_signal"
+
+
+def test_reporter_track_record_passes():
+    checks = _check_reporter_signal(_reporter_report(prior_credited_advisories=5))
+    assert checks[0].outcome == CheckOutcome.PASS
+
+
+def test_reporter_no_metadata_is_indeterminate():
+    checks = _check_reporter_signal(_reporter_report())
+    assert checks[0].outcome == CheckOutcome.INDETERMINATE
+
+
+def test_reporter_new_account_is_neutral():
+    """A new account with no track record is neutral, not penalized."""
+    report = _reporter_report(account_age_days=3, submission_velocity_30d=2)
+    checks = _check_reporter_signal(report)
+    assert checks[0].outcome == CheckOutcome.INDETERMINATE
+
+
+def test_reporter_velocity_beats_track_record():
+    report = _reporter_report(submission_velocity_30d=100, prior_credited_advisories=5)
+    assert _check_reporter_signal(report)[0].outcome == CheckOutcome.FAIL
