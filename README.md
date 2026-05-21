@@ -60,17 +60,17 @@ GitHub App, GitLab webhook, Maildir watcher, or stdin CLI. Same internal schema 
 - [x] Architecture doc
 - [x] Code reference grounding (git-based)
 - [x] GHSA / NVD dedup
-- [ ] CWE plausibility
-- [ ] Reporter signal
+- [x] CWE plausibility
+- [x] Reporter signal
 - [x] Confidence scoring + suggested action
 - [x] CLI (triage from stdin or file, JSON or text)
 - [ ] LLM layer with grounded prompts
 - [ ] Prompt injection hardening
 - [ ] GitHub App
 - [ ] GitLab / email adapters
-- [x] Benchmark dataset
+- [x] Benchmark dataset (30 reports) + evaluation harness
 
-88 tests passing, CI green on 3.11 and 3.12.
+117 tests passing, CI green on 3.11 and 3.12.
 
 Target: prototype usable by mid-2026.
 
