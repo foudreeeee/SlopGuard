@@ -1,0 +1,16 @@
+{
+  "id": "genuine-013",
+  "source": "github",
+  "title": "Prototype pollution in deepMerge utility",
+  "description": "The deepMerge() helper in src/util/merge.js recursively copies keys from a source object into a target without guarding the __proto__ or constructor keys. A source object carrying a __proto__ entry pollutes Object.prototype, affecting every object in the process and letting an attacker bypass property-based checks. Skip __proto__, constructor, and prototype keys when merging.",
+  "claimed_affected_versions": [">= 4.0.0", "< 4.3.2"],
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-1321"],
+  "code_references": [
+    {"file_path": "src/util/merge.js", "line_number": 18, "symbol": "deepMerge"}
+  ],
+  "poc_present": true,
+  "poc_text": "Merge a parsed JSON body whose top-level key is __proto__ and observe the polluted property on an unrelated object.",
+  "reporter": {"handle": "js-proto", "account_age_days": 980, "prior_credited_advisories": 4, "submission_velocity_30d": 3},
+  "received_at": "2026-02-27T18:05:00Z"
+}

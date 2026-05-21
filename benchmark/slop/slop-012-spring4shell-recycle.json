@@ -1,0 +1,14 @@
+{
+  "id": "slop-012",
+  "source": "github",
+  "title": "Spring4Shell RCE (CVE-2022-22965)",
+  "description": "Your project is vulnerable to Spring4Shell, CVE-2022-22965. The Spring Framework allows remote code execution through data binding when running on JDK 9 or later. An attacker can craft a malicious request to write a web shell. Upgrade Spring to 5.3.18 or later immediately.",
+  "claimed_affected_versions": ["< 5.3.18"],
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-94"],
+  "code_references": [],
+  "poc_present": true,
+  "poc_text": "class.module.classLoader data-binding payload to drop a JSP web shell.",
+  "reporter": {"handle": "java-sec-ai", "account_age_days": 6, "prior_credited_advisories": 0, "submission_velocity_30d": 44},
+  "received_at": "2026-03-25T14:00:00Z"
+}

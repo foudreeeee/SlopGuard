@@ -1,0 +1,16 @@
+{
+  "id": "genuine-015",
+  "source": "github",
+  "title": "Admin metrics endpoint missing authentication",
+  "description": "The /admin/metrics endpoint returns internal metrics (user counts, queue depths, recent errors with stack traces) but has no authentication, unlike the other admin routes. metrics_view in admin/routes.py is registered without the login_required decorator, so it is reachable unauthenticated.",
+  "claimed_affected_versions": [">= 1.5.0"],
+  "claimed_severity": "medium",
+  "claimed_cwe": ["CWE-306"],
+  "code_references": [
+    {"file_path": "admin/routes.py", "line_number": 140, "symbol": "metrics_view"}
+  ],
+  "poc_present": true,
+  "poc_text": "Request http://target/admin/metrics with no credentials; the metrics JSON is returned.",
+  "reporter": {"handle": "authz-scan", "account_age_days": 1100, "prior_credited_advisories": 3, "submission_velocity_30d": 1},
+  "received_at": "2026-02-05T12:00:00Z"
+}

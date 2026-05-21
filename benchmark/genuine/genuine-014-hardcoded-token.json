@@ -1,0 +1,15 @@
+{
+  "id": "genuine-014",
+  "source": "github",
+  "title": "Hardcoded API token committed in source",
+  "description": "settings/defaults.py contains a hardcoded production API token assigned to DEFAULT_ANALYTICS_TOKEN. The token is live and grants write access to the analytics account. It is present in git history and ships in the published package. Rotate the token and load it from the environment instead.",
+  "claimed_affected_versions": [">= 2.0.0"],
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-798"],
+  "code_references": [
+    {"file_path": "settings/defaults.py", "line_number": 12, "symbol": "DEFAULT_ANALYTICS_TOKEN"}
+  ],
+  "poc_present": false,
+  "reporter": {"handle": "secret-scan", "account_age_days": 1320, "prior_credited_advisories": 5, "submission_velocity_30d": 2},
+  "received_at": "2026-02-02T08:20:00Z"
+}

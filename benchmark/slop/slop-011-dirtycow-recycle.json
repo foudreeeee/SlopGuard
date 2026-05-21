@@ -1,0 +1,12 @@
+{
+  "id": "slop-011",
+  "source": "github",
+  "title": "Dirty COW privilege escalation (CVE-2016-5195)",
+  "description": "Your software is vulnerable to Dirty COW (CVE-2016-5195), a race condition in the Linux kernel copy-on-write mechanism that allows local privilege escalation to root. An attacker can gain write access to read-only memory mappings. Please patch the affected code.",
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-362"],
+  "code_references": [],
+  "poc_present": false,
+  "reporter": {"handle": "kernel-hunter", "account_age_days": 21, "prior_credited_advisories": 0, "submission_velocity_30d": 17},
+  "received_at": "2026-03-22T09:15:00Z"
+}

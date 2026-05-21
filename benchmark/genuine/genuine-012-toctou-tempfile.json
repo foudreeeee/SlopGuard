@@ -1,0 +1,16 @@
+{
+  "id": "genuine-012",
+  "source": "email",
+  "title": "TOCTOU race in temp-file creation allows symlink attack",
+  "description": "write_cache() in cache/store.py checks os.path.exists(path) and then opens the path for writing in a separate step. Between the check and the open, a local attacker can swap in a symlink, causing the process to overwrite an arbitrary file with the cache contents. Use os.open with O_CREAT and O_EXCL instead.",
+  "claimed_affected_versions": [">= 1.2"],
+  "claimed_severity": "medium",
+  "claimed_cwe": ["CWE-367"],
+  "code_references": [
+    {"file_path": "cache/store.py", "line_number": 52, "symbol": "write_cache"}
+  ],
+  "poc_present": true,
+  "poc_text": "Race the gap between the exists() check and the open() with a symlink pointing at a target file.",
+  "reporter": {"handle": "race-cond", "account_age_days": 1750, "prior_credited_advisories": 6, "submission_velocity_30d": 2},
+  "received_at": "2026-02-24T15:40:00Z"
+}

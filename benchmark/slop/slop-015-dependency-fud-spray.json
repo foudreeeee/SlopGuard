@@ -1,0 +1,11 @@
+{
+  "id": "slop-015",
+  "source": "github",
+  "title": "URGENT: Multiple critical vulnerabilities in dependencies",
+  "description": "Hello, our security team identified multiple critical vulnerabilities in your project's dependencies. These could be exploited by attackers. Immediate action is required. Please contact us for the detailed report and remediation services. We have notified hundreds of projects with similar issues.",
+  "claimed_severity": "critical",
+  "code_references": [],
+  "poc_present": false,
+  "reporter": {"handle": "sec-services-corp", "account_age_days": 1, "prior_credited_advisories": 0, "submission_velocity_30d": 88},
+  "received_at": "2026-04-03T07:20:00Z"
+}

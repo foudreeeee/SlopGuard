@@ -1,0 +1,11 @@
+{
+  "id": "slop-014",
+  "source": "github",
+  "title": "Vulnerability detected by automated AI security scan",
+  "description": "Our AI-powered security platform detected a potential vulnerability in your repository. The analysis indicates possible insecure handling of user input that could lead to security issues. We recommend a thorough review. This is one of several findings from our automated scan of popular open source projects.",
+  "claimed_severity": "medium",
+  "code_references": [],
+  "poc_present": false,
+  "reporter": {"handle": "ai-secscan-platform", "account_age_days": 3, "prior_credited_advisories": 0, "submission_velocity_30d": 210},
+  "received_at": "2026-04-01T05:00:00Z"
+}

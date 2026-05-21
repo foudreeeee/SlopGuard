@@ -1,0 +1,12 @@
+{
+  "id": "slop-013",
+  "source": "email",
+  "title": "EternalBlue SMB exploit (CVE-2017-0144)",
+  "description": "Your application is vulnerable to EternalBlue, CVE-2017-0144. This exploits a flaw in the Microsoft SMBv1 protocol allowing remote code execution, the same one used by WannaCry. An attacker on the network can take over the host. Critical, please address.",
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-20"],
+  "code_references": [],
+  "poc_present": false,
+  "reporter": {"handle": "smb-exploit", "account_age_days": 4, "prior_credited_advisories": 0, "submission_velocity_30d": 38},
+  "received_at": "2026-03-28T16:45:00Z"
+}

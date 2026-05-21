@@ -1,0 +1,16 @@
+{
+  "id": "genuine-008",
+  "source": "github",
+  "title": "CSRF on account email-change endpoint",
+  "description": "The POST /account/email endpoint changes the account email but does not validate any CSRF token or check the Origin/Referer header. A malicious page can submit a cross-site form that changes a logged-in user's email, enabling account takeover through password reset. The update_email view in accounts/views.py has the framework's CSRF protection disabled for this route.",
+  "claimed_affected_versions": [">= 2.1.0"],
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-352"],
+  "code_references": [
+    {"file_path": "accounts/views.py", "line_number": 78, "symbol": "update_email"}
+  ],
+  "poc_present": true,
+  "poc_text": "Host an auto-submitting form POSTing to /account/email with the attacker's address; a logged-in victim who visits it has their email changed.",
+  "reporter": {"handle": "csrf-finder", "account_age_days": 820, "prior_credited_advisories": 3, "submission_velocity_30d": 1},
+  "received_at": "2026-02-15T10:00:00Z"
+}

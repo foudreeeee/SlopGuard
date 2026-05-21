@@ -23,9 +23,9 @@ def test_benchmark_layout():
 def test_benchmark_counts():
     slop = list((BENCHMARK / "slop").glob("*.json"))
     genuine = list((BENCHMARK / "genuine").glob("*.json"))
-    assert 5 <= len(slop) <= 12
-    assert 5 <= len(genuine) <= 12
-    assert 10 <= len(slop) + len(genuine) <= 20
+    assert len(slop) >= 8
+    assert len(genuine) >= 8
+    assert 20 <= len(slop) + len(genuine) <= 30  # hard cap at 30
 
 
 @pytest.mark.parametrize(

@@ -1,0 +1,16 @@
+{
+  "id": "genuine-010",
+  "source": "gitlab",
+  "title": "Open redirect via unchecked next parameter on login",
+  "description": "After login the app redirects to the value of the next query parameter without checking it is a local path. A link like /login?next=https://evil.example/phish sends authenticated users off-site, useful for phishing and OAuth token theft. redirect_after_login in auth/flow.py passes next straight to redirect().",
+  "claimed_affected_versions": [">= 1.0"],
+  "claimed_severity": "medium",
+  "claimed_cwe": ["CWE-601"],
+  "code_references": [
+    {"file_path": "auth/flow.py", "line_number": 61, "symbol": "redirect_after_login"}
+  ],
+  "poc_present": true,
+  "poc_text": "Visit /login?next=https://evil.example/ and complete login; the response redirects off-site.",
+  "reporter": {"handle": "redirect-bob", "account_age_days": 640, "prior_credited_advisories": 2, "submission_velocity_30d": 1},
+  "received_at": "2026-02-21T13:10:00Z"
+}

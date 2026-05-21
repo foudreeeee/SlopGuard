@@ -1,0 +1,16 @@
+{
+  "id": "genuine-009",
+  "source": "github",
+  "title": "IDOR: any user can read others' invoices by id",
+  "description": "GET /api/invoices/{id} returns the invoice without checking that it belongs to the authenticated user. Incrementing the id enumerates and discloses every customer's invoice (names, addresses, amounts). get_invoice in api/invoices.py looks the record up by primary key only, with no ownership check.",
+  "claimed_affected_versions": ["<= 3.2.1"],
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-639"],
+  "code_references": [
+    {"file_path": "api/invoices.py", "line_number": 44, "symbol": "get_invoice"}
+  ],
+  "poc_present": true,
+  "poc_text": "Authenticate as user A, request /api/invoices/1001 through /api/invoices/1100, observe other users' invoices.",
+  "reporter": {"handle": "idor-jane", "account_age_days": 1500, "prior_credited_advisories": 8, "submission_velocity_30d": 2},
+  "received_at": "2026-02-18T11:30:00Z"
+}

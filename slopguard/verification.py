@@ -171,9 +171,10 @@ def _git_show(repo: Path, commit: str, path: str) -> str | None:
         return None
 
 
-# Provisional and untuned. Phase 1 evaluation against the benchmark set will
-# set this for real. Leaning high on purpose: a false "duplicate" flag that
-# buries a novel report is worse than letting a real dupe through to the LLM.
+# Validated on the 30-report benchmark: exact CVE/GHSA-id recycling scores 1.0
+# and is caught at any threshold, while no genuine report there scores above
+# ~0.3, so 0.6 leaves a wide false-positive margin. Reworded dupes that share
+# no id (fuzzy matches) still need real examples to tune against (issue #1).
 DEDUP_THRESHOLD = 0.6
 
 

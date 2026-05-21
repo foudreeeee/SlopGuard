@@ -60,6 +60,52 @@ EVAL_CORPUS = [
         aliases=["CVE-2021-3156"],
         cwe_ids=["CWE-787"],
     ),
+    Advisory(
+        id="CVE-2014-6271",
+        source="nvd",
+        title="CVE-2014-6271 (Shellshock)",
+        summary=(
+            "GNU Bash processes trailing strings after function definitions in "
+            "environment variables, allowing remote code execution via crafted "
+            "values (Shellshock)."
+        ),
+        aliases=["CVE-2014-6271"],
+        cwe_ids=["CWE-78"],
+    ),
+    Advisory(
+        id="CVE-2016-5195",
+        source="nvd",
+        title="CVE-2016-5195 (Dirty COW)",
+        summary=(
+            "A race condition in the Linux kernel copy-on-write handling lets a "
+            "local user gain write access to read-only memory and escalate "
+            "privileges (Dirty COW)."
+        ),
+        aliases=["CVE-2016-5195"],
+        cwe_ids=["CWE-362"],
+    ),
+    Advisory(
+        id="CVE-2022-22965",
+        source="nvd",
+        title="CVE-2022-22965 (Spring4Shell)",
+        summary=(
+            "Spring Framework data binding on JDK 9+ allows remote code "
+            "execution by manipulating class loader properties (Spring4Shell)."
+        ),
+        aliases=["CVE-2022-22965"],
+        cwe_ids=["CWE-94"],
+    ),
+    Advisory(
+        id="CVE-2017-0144",
+        source="nvd",
+        title="CVE-2017-0144 (EternalBlue)",
+        summary=(
+            "The Microsoft SMBv1 server mishandles crafted packets, allowing "
+            "remote code execution (EternalBlue, used by WannaCry)."
+        ),
+        aliases=["CVE-2017-0144"],
+        cwe_ids=["CWE-20"],
+    ),
 ]
 
 # Actions that mean the tool steered the maintainer away from normal handling.

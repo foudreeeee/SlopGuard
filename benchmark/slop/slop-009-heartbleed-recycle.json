@@ -1,0 +1,14 @@
+{
+  "id": "slop-009",
+  "source": "github",
+  "title": "Heartbleed vulnerability (CVE-2014-0160) in your library",
+  "description": "Your project is affected by the Heartbleed vulnerability, CVE-2014-0160. An attacker can exploit the TLS heartbeat extension to read sensitive memory from the server, including private keys and passwords. This is a critical issue affecting all versions. Please upgrade OpenSSL to 1.0.1g or later.",
+  "claimed_affected_versions": ["all"],
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-125"],
+  "code_references": [],
+  "poc_present": true,
+  "poc_text": "Send a malformed TLS heartbeat request to leak process memory.",
+  "reporter": {"handle": "cve-scanner-bot", "account_age_days": 15, "prior_credited_advisories": 0, "submission_velocity_30d": 33},
+  "received_at": "2026-03-18T08:00:00Z"
+}

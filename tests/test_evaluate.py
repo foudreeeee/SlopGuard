@@ -18,7 +18,7 @@ VALID_ACTIONS = {
 
 def test_eval_runs_over_full_benchmark():
     rows = run()
-    assert len(rows) == 15  # 8 slop + 7 genuine
+    assert len(rows) == 30  # 15 slop + 15 genuine
     for r in rows:
         assert 0 <= r.score <= 100
         assert r.action in VALID_ACTIONS
@@ -32,6 +32,7 @@ def test_eval_no_false_positives_on_genuine():
 
 
 def test_eval_catches_recycled_cve():
-    """The one slop report that recycles a known CVE is caught by dedup."""
+    """Every slop report that recycles a known CVE is caught by dedup."""
     by_id = {r.id: r for r in run()}
-    assert _flagged(by_id["slop-002"].action)
+    recycled = ["slop-002", "slop-009", "slop-010", "slop-011", "slop-012", "slop-013"]
+    assert all(_flagged(by_id[rid].action) for rid in recycled)

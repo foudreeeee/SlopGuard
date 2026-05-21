@@ -1,0 +1,13 @@
+{
+  "id": "slop-010",
+  "source": "email",
+  "title": "Shellshock (CVE-2014-6271) remote code execution",
+  "description": "I found that your application is vulnerable to Shellshock, CVE-2014-6271. By crafting a malicious environment variable, an attacker can execute arbitrary commands through the Bash shell. This affects any CGI script that invokes bash. Critical remote code execution, please fix urgently.",
+  "claimed_severity": "critical",
+  "claimed_cwe": ["CWE-78"],
+  "code_references": [],
+  "poc_present": true,
+  "poc_text": "() { :;}; /bin/cat /etc/passwd",
+  "reporter": {"handle": "shell-master", "account_age_days": 9, "prior_credited_advisories": 0, "submission_velocity_30d": 28},
+  "received_at": "2026-03-20T12:30:00Z"
+}

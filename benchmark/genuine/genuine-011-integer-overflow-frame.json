@@ -1,0 +1,16 @@
+{
+  "id": "genuine-011",
+  "source": "github",
+  "title": "Integer overflow in length field leads to undersized allocation",
+  "description": "In the binary protocol parser parse_frame() in src/proto/frame.c, the 32-bit length field is multiplied by the element size with no overflow check, then passed to malloc. A crafted length wraps the multiplication, a small buffer is allocated, and the following copy writes past it. Heap overflow reachable from network input.",
+  "claimed_affected_versions": ["<= 0.8.4"],
+  "claimed_severity": "high",
+  "claimed_cwe": ["CWE-190"],
+  "code_references": [
+    {"file_path": "src/proto/frame.c", "line_number": 120, "symbol": "parse_frame"}
+  ],
+  "poc_present": true,
+  "poc_text": "Send a frame whose length field is 0x40000001 against a build with 32-bit size_t.",
+  "reporter": {"handle": "memsafety", "account_age_days": 2100, "prior_credited_advisories": 11, "submission_velocity_30d": 1},
+  "received_at": "2026-01-29T09:00:00Z"
+}
