@@ -40,6 +40,9 @@ dev = [
     "ruff==0.6.9",
 ]
 
+[project.scripts]
+slopguard = "slopguard.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/foudreeeee/slopguard"
 Issues = "https://github.com/foudreeeee/slopguard/issues"
