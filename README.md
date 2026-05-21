@@ -58,7 +58,7 @@ GitHub App, GitLab webhook, Maildir watcher, or stdin CLI. Same internal schema 
 
 - [x] Schema (Pydantic, tested)
 - [x] Architecture doc
-- [ ] Code reference grounding (in progress)
+- [x] Code reference grounding (git-based, 10 tests passing)
 - [ ] GHSA / NVD dedup
 - [ ] CWE plausibility
 - [ ] LLM layer with grounded prompts
