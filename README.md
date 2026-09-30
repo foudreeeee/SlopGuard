@@ -2,7 +2,7 @@
 
 Triage layer for incoming vulnerability reports, aimed at open-source maintainers drowning in AI-generated slop.
 
-Early days. No releases yet. Static checks and a CLI work now, the LLM layer is next.
+The static layer and CLI work now and are tagged **v0.1.0**. The grounded LLM pass is next.
 
 ## Why
 
