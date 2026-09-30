@@ -48,6 +48,21 @@ Background reading that shaped the design of SlopGuard. Living document.
 - **GitHub Security Lab Taskflow Agent** ([blog post](https://github.blog/security/community-powered-security-with-ai-an-open-source-framework-for-security-research/)). Finds bugs in OSS, the inverse problem.
 - **AgentShield AI / sigma-ai**, **Agent-Threat-Rule (ATR)**. Sigma rules for AI agents under attack. Different problem (defending an AI agent, not detecting AI in vulnerability reports).
 
+## Observed limitations (from testing the LLM layer)
+
+Ran the grounded LLM pass against a small fixture: a repo with a real substring-membership authorization bug (`if required in role`), and two reports pointing at that same function — one genuine, one slop. Backend was a local llama3.2 (3B) over Ollama.
+
+- Genuine report (the substring bug) → PLAUSIBLE, correct justification. Good.
+- Slop report claiming a SQL injection in that function — there is no SQL anywhere in the file → also PLAUSIBLE. The model invented a `SELECT` and "unsanitized query concatenation" that don't exist, then leaned on the real substring bug to justify itself.
+
+Two takeaways, neither fixed yet:
+
+1. **The citation guardrail catches fabricated *locations*, not fabricated *semantics*.** `_validate_citations` checks that every line the model cites is inside the context it was shown. The slop verdict cited line 132 — real, in context — so it passed. The model's *description* of that line was the hallucination, and nothing checks that. Grounding the citations is necessary but not sufficient.
+
+2. **A small local model is not enough for this.** A 3B confidently rubber-stamped an obviously false claim. The whole point is catching slop, so the model has to be strong enough to answer IMPLAUSIBLE when the code contradicts the report. That likely means a larger model (hosted, or a bigger local one) and/or a second adversarial pass that asks specifically: does the cited code actually contain the mechanism the report describes?
+
+Noting these so the limits are on the record, not discovered in production.
+
 ## To read
 
 - The OpenSSF Vulnerability Disclosures Working Group meeting notes (if/when public).
