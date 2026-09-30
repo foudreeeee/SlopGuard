@@ -41,6 +41,11 @@ def main(argv: list[str] | None = None) -> int:
     triage.add_argument("--repo", required=True, help="Path to a clone of the project.")
     triage.add_argument("--file", help="Report JSON file. Reads stdin if omitted.")
     triage.add_argument("--text", action="store_true", help="Readable output.")
+    triage.add_argument(
+        "--llm",
+        action="store_true",
+        help="Also run the grounded LLM pass (needs SLOPGUARD_LLM_API_KEY).",
+    )
 
     refresh = sub.add_parser("refresh", help="Refresh the GHSA/NVD advisory cache.")
     refresh.add_argument("--nvd-max", type=int, default=2000)
@@ -76,7 +81,18 @@ def _cmd_triage(args: argparse.Namespace) -> int:
         return 2
 
     checks = verify_report(report, str(repo))
-    decision = decide(report, checks)
+
+    llm_assessment = None
+    if args.llm:
+        from slopguard.assessment import assess_claim
+        from slopguard.llm import LLMUnavailableError
+
+        try:
+            llm_assessment = assess_claim(report, checks, str(repo))
+        except LLMUnavailableError as e:
+            print(f"note: LLM pass skipped ({e}); static-only result.", file=sys.stderr)
+
+    decision = decide(report, checks, llm_assessment)
 
     if args.text:
         print(_format_text(decision))
@@ -121,6 +137,12 @@ def _format_text(decision: TriageDecision) -> str:
             lines.append("")
             lines.append(title)
             lines += [f"  - {c.name}: {c.detail}" for c in groups[outcome]]
+    if decision.llm_assessment is not None:
+        lines += [
+            "",
+            f"LLM pass: {decision.llm_assessment.verdict}",
+            f"  {decision.llm_assessment.justification}",
+        ]
     if decision.draft_response:
         lines += ["", "Draft response (edit before sending):", decision.draft_response]
     return "\n".join(lines)

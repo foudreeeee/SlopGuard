@@ -2,7 +2,7 @@
 
 Triage layer for incoming vulnerability reports, aimed at open-source maintainers drowning in AI-generated slop.
 
-The static layer and CLI work now and are tagged **v0.1.0**. The grounded LLM pass is next.
+The static layer, CLI and the grounded LLM pass all work now (v0.1.0 shipped the static layer). The LLM pass is optional — no API key, and the static layer still runs on its own.
 
 ## Why
 
@@ -64,13 +64,13 @@ GitHub App, GitLab webhook, Maildir watcher, or stdin CLI. Same internal schema 
 - [x] Reporter signal
 - [x] Confidence scoring + suggested action
 - [x] CLI (triage from stdin or file, JSON or text)
-- [ ] LLM layer with grounded prompts
-- [ ] Prompt injection hardening
+- [x] LLM layer with grounded prompts
+- [x] Prompt injection hardening (fenced untrusted input + citation validation)
 - [ ] GitHub App
 - [ ] GitLab / email adapters
 - [x] Benchmark dataset (30 reports) + evaluation harness
 
-117 tests passing, CI green on 3.11 and 3.12.
+124 tests passing, CI green on 3.11 and 3.12.
 
 Target: prototype usable by mid-2026.
 
