@@ -70,7 +70,7 @@ GitHub App, GitLab webhook, Maildir watcher, or stdin CLI. Same internal schema 
 - [ ] GitLab / email adapters
 - [x] Benchmark dataset (30 reports) + evaluation harness
 
-124 tests passing, CI green on 3.11 and 3.12.
+126 tests passing, CI green on 3.11 and 3.12.
 
 Target: prototype usable by mid-2026.
 
@@ -80,6 +80,33 @@ Month 1: static layer, CLI works.
 Month 2: LLM layer on top, end-to-end.
 Months 3-4: other adapters, hardening, 1.0.
 Months 5-6: pilot with whichever maintainer is brave enough, refine.
+
+## Running the LLM pass
+
+The LLM pass is off unless you ask for it with `triage --llm`. Two backends,
+picked with `SLOPGUARD_LLM_PROVIDER`:
+
+Hosted Claude (default):
+
+```bash
+pip install -e ".[llm]"
+export SLOPGUARD_LLM_API_KEY=sk-ant-...
+slopguard triage --repo /path/to/clone --file report.json --llm --text
+```
+
+Fully local, no key, no per-call cost — any OpenAI-compatible runtime (Ollama,
+llama.cpp, LM Studio, vLLM):
+
+```bash
+pip install -e ".[llm]"
+export SLOPGUARD_LLM_PROVIDER=openai
+export SLOPGUARD_LLM_BASE_URL=http://localhost:11434/v1   # Ollama
+export SLOPGUARD_LLM_MODEL=llama3.1
+slopguard triage --repo /path/to/clone --file report.json --llm --text
+```
+
+No backend configured? The `--llm` flag is a no-op with a note, and the static
+layer runs on its own.
 
 ## Running tests
 

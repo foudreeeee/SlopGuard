@@ -105,8 +105,25 @@ def test_plausible_verdict_lifts_the_decision_score(monkeypatch):
 
 
 def test_llm_unavailable_without_a_key(monkeypatch):
+    monkeypatch.delenv("SLOPGUARD_LLM_PROVIDER", raising=False)
     monkeypatch.delenv("SLOPGUARD_LLM_API_KEY", raising=False)
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     assert llm.available() is False
+    with pytest.raises(llm.LLMUnavailableError):
+        llm.complete("system", "user")
+
+
+def test_local_openai_backend_is_available_without_a_key(monkeypatch):
+    monkeypatch.setenv("SLOPGUARD_LLM_PROVIDER", "openai")
+    monkeypatch.setenv("SLOPGUARD_LLM_BASE_URL", "http://localhost:11434/v1")
+    monkeypatch.delenv("SLOPGUARD_LLM_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    assert llm.available() is True  # a local endpoint needs no key
+
+
+def test_openai_backend_requires_a_model(monkeypatch):
+    monkeypatch.setenv("SLOPGUARD_LLM_PROVIDER", "openai")
+    monkeypatch.setenv("SLOPGUARD_LLM_BASE_URL", "http://localhost:11434/v1")
+    monkeypatch.delenv("SLOPGUARD_LLM_MODEL", raising=False)
     with pytest.raises(llm.LLMUnavailableError):
         llm.complete("system", "user")

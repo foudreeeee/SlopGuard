@@ -44,7 +44,7 @@ def main(argv: list[str] | None = None) -> int:
     triage.add_argument(
         "--llm",
         action="store_true",
-        help="Also run the grounded LLM pass (needs SLOPGUARD_LLM_API_KEY).",
+        help="Also run the grounded LLM pass (needs an LLM backend; see README).",
     )
 
     refresh = sub.add_parser("refresh", help="Refresh the GHSA/NVD advisory cache.")
