@@ -67,6 +67,7 @@ _CATEGORY_BY_CHECK = {
     "file_not_found": "code_reference",
     "line_out_of_range": "code_reference",
     "symbol_never_found": "code_reference",
+    "symbol_not_in_code": "code_reference",
     "advisory_dedup": "advisory_dedup",
     "no_known_duplicate": "advisory_dedup",
     "possible_duplicate": "advisory_dedup",
