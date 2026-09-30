@@ -108,6 +108,20 @@ slopguard triage --repo /path/to/clone --file report.json --llm --text
 No backend configured? The `--llm` flag is a no-op with a note, and the static
 layer runs on its own.
 
+## Sharper symbol checks (optional)
+
+The symbol check confirms a cited symbol exists in the file. By default that's
+a substring test, so a hallucinated symbol that's also a common word can slip
+through. Install tree-sitter and it checks whether the symbol is a real code
+identifier instead of comment or string text — a symbol seen only in a comment
+becomes `symbol_not_in_code` (indeterminate) rather than a pass.
+
+```bash
+pip install -e ".[treesitter]"
+```
+
+Not installed → it falls back to the substring test, no error.
+
 ## Running tests
 
 ```bash

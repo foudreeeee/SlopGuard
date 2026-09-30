@@ -24,6 +24,7 @@ from slopguard.schema import (
     Report,
     VerificationCheck,
 )
+from slopguard.symbols import symbol_is_code_identifier
 
 
 def verify_report(
@@ -56,11 +57,12 @@ def _check_code_references(
       - Resolve the target commit (claimed_commit, else HEAD)
       - Check the file exists at that commit
       - If a line number is given, check the line is in range
-      - If a symbol is given, do a coarse substring search (tree-sitter later)
+      - If a symbol is given, confirm it appears as a real code identifier
 
-    Symbol-level checks are intentionally lax for now: we only flag
-    `symbol_never_found` when the symbol literally doesn't appear anywhere in
-    the file. Tree-sitter integration (planned for Phase 2) will tighten this.
+    Symbol checks use tree-sitter when it's installed: a symbol that shows up
+    only in a comment or string is flagged `symbol_not_in_code` (INDETERMINATE),
+    and one absent entirely is `symbol_never_found` (FAIL). Without tree-sitter
+    it falls back to a plain substring test (present -> pass, absent -> fail).
     """
     if not report.code_references:
         return []
@@ -121,7 +123,21 @@ def _check_one_reference(
             )
 
     if ref.symbol is not None:
-        if ref.symbol not in file_content:
+        present = ref.symbol in file_content
+        as_identifier = symbol_is_code_identifier(
+            file_content, ref.file_path, ref.symbol
+        )
+        if as_identifier is False and present:
+            return VerificationCheck(
+                name="symbol_not_in_code",
+                outcome=CheckOutcome.INDETERMINATE,
+                detail=(
+                    f"Symbol {ref.symbol!r} appears in {ref.file_path} but only "
+                    f"in comments or strings, not as a code identifier at commit "
+                    f"{commit[:8]}."
+                ),
+            )
+        if not present or as_identifier is False:
             return VerificationCheck(
                 name="symbol_never_found",
                 outcome=CheckOutcome.FAIL,

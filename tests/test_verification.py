@@ -128,6 +128,21 @@ def test_symbol_hallucinated_fails(tiny_repo: Path):
     assert checks[0].name == "symbol_never_found"
 
 
+def test_symbol_in_comment_only_is_indeterminate(tmp_path: Path):
+    """A symbol that appears only in a comment isn't a real code identifier."""
+    pytest.importorskip("tree_sitter_language_pack")
+    _init_repo(tmp_path)
+    (tmp_path / "m.py").write_text(
+        "# parse_json is only named in this comment\n"
+        "def other():\n    return 1\n"
+    )
+    _commit_all(tmp_path)
+    report = _make_report([CodeReference(file_path="m.py", symbol="parse_json")])
+    checks = _check_code_references(report, str(tmp_path))
+    assert checks[0].outcome == CheckOutcome.INDETERMINATE
+    assert checks[0].name == "symbol_not_in_code"
+
+
 def test_multiple_references(tiny_repo: Path):
     """Multiple references in one report should each produce a check."""
     report = _make_report([

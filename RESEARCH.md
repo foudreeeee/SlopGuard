@@ -66,5 +66,6 @@ Noting these so the limits are on the record, not discovered in production.
 ## To read
 
 - The OpenSSF Vulnerability Disclosures Working Group meeting notes (if/when public).
-- Tree-sitter language bindings, for the symbol-grounding phase 2.
 - The Mistral / GPT / Claude structured-output documentation, for cost benchmarking.
+
+Tree-sitter symbol grounding (was here as future work) is now in — an optional extra; the symbol check uses it when installed and falls back to substring otherwise.
