@@ -413,6 +413,29 @@ _CAPABILITY_MARKERS = {
         "axios", "fetch(", "net/http", "reqwest", "urlopen",
     ],
     "regex": ["import re", "re.compile", "regexp", "pattern.compile", "regex::"],
+    "filesystem": [
+        "open(", "pathlib", "os.path", "os.open", "os.walk", "shutil",
+        "readfile", "read_file", "writefile", "fs.", "fopen", "ioutil",
+        "sendfile", "path.join", "std::fs", "std::ifstream", "file.read",
+    ],
+    "crypto": [
+        "hashlib", "md5(", "sha1(", "hmac", "bcrypt", "scrypt", "pbkdf2",
+        "cipher", "createcipher", "crypto.", "cryptography.hazmat", "openssl",
+        "messagedigest", ".digest(", "des.new", "aes.new",
+    ],
+    "ldap": [
+        "ldap3", "python-ldap", "ldap.", "ldapconnection", "dircontext",
+        "initialldapcontext", "ldap://", "ldapsearch", "com.sun.jndi.ldap",
+    ],
+    "xpath": [
+        "xpath", "lxml.etree", "etree.xpath", "xpathexpression",
+        "xpath.compile", "selectnodes", "xpathevaluator",
+    ],
+    "file_upload": [
+        "multipart/form-data", "multipartfile", "request.files", "formdata",
+        "multer", "fileupload", "secure_filename", "filestorage", "busboy",
+        "formidable",
+    ],
 }
 _CWE_CAPABILITY = {
     "CWE-89": "database",
@@ -427,6 +450,17 @@ _CWE_CAPABILITY = {
     "CWE-776": "xml",
     "CWE-918": "http_client",
     "CWE-1333": "regex",
+    "CWE-943": "database",  # NoSQL / data-query injection
+    "CWE-95": "command_exec",  # eval injection
+    "CWE-96": "command_exec",  # static code injection
+    "CWE-116": "web_output",  # improper output encoding/escaping
+    "CWE-22": "filesystem",  # path traversal
+    "CWE-434": "file_upload",  # unrestricted upload of dangerous file type
+    "CWE-327": "crypto",  # broken/risky crypto algorithm
+    "CWE-328": "crypto",  # weak / reversible hash
+    "CWE-916": "crypto",  # password hash with insufficient effort
+    "CWE-90": "ldap",  # LDAP injection
+    "CWE-643": "xpath",  # XPath injection
 }
 
 
