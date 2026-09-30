@@ -394,6 +394,32 @@ def web_repo(tmp_path: Path) -> Path:
     return tmp_path
 
 
+@pytest.fixture
+def crypto_repo(tmp_path: Path) -> Path:
+    """A repo whose source clearly has a crypto surface."""
+    _init_repo(tmp_path)
+    (tmp_path / "auth.py").write_text(
+        "import hashlib\n\ndef h(p):\n    return hashlib.md5(p).hexdigest()\n"
+    )
+    (tmp_path / "a.py").write_text("def add(x, y):\n    return x + y\n")
+    (tmp_path / "b.py").write_text("def mul(x, y):\n    return x * y\n")
+    _commit_all(tmp_path)
+    return tmp_path
+
+
+@pytest.fixture
+def fs_repo(tmp_path: Path) -> Path:
+    """A repo whose source clearly touches the filesystem."""
+    _init_repo(tmp_path)
+    (tmp_path / "files.py").write_text(
+        "def read(name):\n    return open(name).read()\n"
+    )
+    (tmp_path / "a.py").write_text("def add(x, y):\n    return x + y\n")
+    (tmp_path / "b.py").write_text("def mul(x, y):\n    return x * y\n")
+    _commit_all(tmp_path)
+    return tmp_path
+
+
 def _cwe_report(cwes: list[str] | None) -> Report:
     return Report(
         id="t",
@@ -440,6 +466,29 @@ def test_cwe_too_few_files_is_indeterminate(tmp_path: Path):
     _commit_all(tmp_path)
     checks = _check_cwe_plausibility(_cwe_report(["CWE-89"]), str(tmp_path))
     assert checks[0].outcome == CheckOutcome.INDETERMINATE
+
+
+def test_cwe_crypto_plausible_when_surface_present(crypto_repo: Path):
+    checks = _check_cwe_plausibility(_cwe_report(["CWE-327"]), str(crypto_repo))
+    assert checks[0].outcome == CheckOutcome.PASS
+    assert checks[0].name == "cwe_plausible"
+
+
+def test_cwe_path_traversal_plausible_when_filesystem_present(fs_repo: Path):
+    checks = _check_cwe_plausibility(_cwe_report(["CWE-22"]), str(fs_repo))
+    assert checks[0].outcome == CheckOutcome.PASS
+
+
+def test_cwe_ldap_implausible_when_surface_absent(bare_repo: Path):
+    """A newly modeled class still flags implausible when its surface is absent."""
+    checks = _check_cwe_plausibility(_cwe_report(["CWE-90"]), str(bare_repo))
+    assert checks[0].outcome == CheckOutcome.FAIL
+    assert checks[0].name == "cwe_implausible"
+
+
+def test_cwe_nosql_reuses_database_surface(bare_repo: Path):
+    checks = _check_cwe_plausibility(_cwe_report(["CWE-943"]), str(bare_repo))
+    assert checks[0].outcome == CheckOutcome.FAIL
 
 
 # --- reporter signal -------------------------------------------------------
